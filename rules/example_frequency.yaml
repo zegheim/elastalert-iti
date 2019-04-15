@@ -1,0 +1,55 @@
+# Alert when the rate of events exceeds a threshold
+
+# (Required)
+# Rule name, must be unique
+name: Example frequency rule
+
+# (Required)
+# Type of alert.
+# the frequency rule type alerts when num_events events occur with timeframe time
+type: frequency
+
+# (Required)
+# Index to search, wildcard supported
+index: mail_relay_and_directory*
+
+# (Required, frequency specific)
+# Alert when this many documents matching the query occur within a timeframe
+num_events: 5000
+
+# (Required, frequency specific)
+# num_events must occur within this amount of time to trigger an alert
+timeframe:
+  hours: 1
+
+# (Required)
+# A list of Elasticsearch filters used for find events
+# These filters are joined with AND and nested in a filtered query
+# For more info: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl.html
+filter:
+- query:
+    bool:
+      filter:
+        match:
+          fileset.module: "system"
+        match:
+          source.keyword: "/var/log/maillog"
+        match:
+          ed.tier: "live"
+        match:
+          system.syslog.program: "mimedefang.pl"
+      must:
+        query_string:
+          query: "thames*"
+          default_field: "system.syslog.hostname"
+          analyzer: "keyword"
+
+# (Required)
+# The alert is use when a match is found
+alert:
+- "email"
+
+# (required, email specific)
+# a list of email addresses to send alerts to
+email:
+- "J.Kasin@ed.ac.uk"
