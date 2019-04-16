@@ -1,0 +1,61 @@
+# Alert when the rate of events exceeds a threshold
+
+# (Required)
+# Rule name, must be unique
+name: Daemon MTA load average threshold exceeded 
+
+# (Required)
+# Type of alert.
+# the frequency rule type alerts when num_events events occur with timeframe time
+type: frequency
+
+# (Required)
+# Index to search, wildcard supported
+index: mail_relay_and_directory*
+
+# (Required, frequency specific)
+# Alert when this many documents matching the query occur within a timeframe
+num_events: 1
+
+# (Required, frequency specific)
+# num_events must occur within this amount of time to trigger an alert
+timeframe:
+  hours: 1
+
+realert:
+  hours: 1
+
+# (Required)
+# A list of Elasticsearch filters used for find events
+# These filters are joined with AND and nested in a filtered query
+# For more info: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl.html
+filter:
+- query:
+    bool:
+      filter:
+        match:
+          fileset.module: "system"
+        match:
+          source.keyword: "/var/log/maillog"
+        match:
+          ed.tier: "live"
+        match:
+          system.syslog.program: "sendmail"
+      must:
+        query_string:
+          query: "delaying AND connections AND on AND daemon AND MTA AND load AND average"
+          default_field: "system.syslog.message"
+
+# (Required)
+# The alert is use when a match is found
+alert:
+- email:
+    alert_subject: "[elastalert] [ext6033] Daemon MTA load average threshold exceeded for {0}"
+    alert_subject_args:
+      - system.syslog.hostname
+    email: "J.Kasin@ed.ac.uk"
+    email_reply_to: "ext6033@ed.ac.uk"
+    from_addr: "ext6033@ed.ac.uk"
+    smtp_host: "bulkmailrelay.ucs.ed.ac.uk"
+    smtp_port: 25
+    smtp_ssl: false
