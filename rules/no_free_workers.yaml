@@ -2,7 +2,7 @@
 
 # (Required)
 # Rule name, must be unique
-name: mimedefang.pl in thames
+name: No free workers
 
 # (Required)
 # Type of alert.
@@ -15,12 +15,15 @@ index: mail_relay_and_directory*
 
 # (Required, frequency specific)
 # Alert when this many documents matching the query occur within a timeframe
-num_events: 10
+num_events: 1
 
 # (Required, frequency specific)
 # num_events must occur within this amount of time to trigger an alert
 timeframe:
-  seconds: 30
+  hours: 1
+
+realert:
+  hours: 1
 
 # (Required)
 # A list of Elasticsearch filters used for find events
@@ -37,18 +40,17 @@ filter:
         match:
           ed.tier: "live"
         match:
-          system.syslog.program: "mimedefang.pl"
-      must:
-        query_string:
-          query: "thames*"
-          default_field: "system.syslog.hostname"
-          analyzer: "keyword"
+          system.syslog.program: "mimedefang-multiplexor"
+        match:
+          system.syslog.message.keyword: "No free workers"
 
 # (Required)
 # The alert is use when a match is found
 alert:
 - email:
-    alert_subject:
+    alert_subject: "[elastalert] [ext6033] No free workers in {0}"
+    alert_subject_args:
+      - system.syslog.hostname
     email: "J.Kasin@ed.ac.uk"
     email_reply_to: "ext6033@ed.ac.uk"
     from_addr: "ext6033@ed.ac.uk"
