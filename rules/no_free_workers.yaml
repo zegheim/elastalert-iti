@@ -51,7 +51,12 @@ alert:
     alert_subject: "[elastalert] [ext6033] No free workers in {0}"
     alert_subject_args:
       - system.syslog.hostname
-    email: "J.Kasin@ed.ac.uk"
+    alert_text: "There were no free workers in {0} on {1}."
+    alert_text_args:
+      - system.syslog.hostname
+      - system.syslog.timestamp
+    alert_text_type: alert_text_only
+    email: ["J.Kasin@ed.ac.uk", "Kenneth.Macdonald@ed.ac.uk"]
     email_reply_to: "ext6033@ed.ac.uk"
     from_addr: "ext6033@ed.ac.uk"
     smtp_host: "bulkmailrelay.ucs.ed.ac.uk"

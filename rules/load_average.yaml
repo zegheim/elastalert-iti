@@ -53,7 +53,13 @@ alert:
     alert_subject: "[elastalert] [ext6033] Daemon MTA load average threshold exceeded for {0}"
     alert_subject_args:
       - system.syslog.hostname
-    email: "J.Kasin@ed.ac.uk"
+    alert_text: "{0} in {1} on {2}."
+    alert_text_args:
+      - system.syslog.message
+      - system.syslog.hostname
+      - system.syslog.timestamp
+    alert_text_type: alert_text_only
+    email: ["J.Kasin@ed.ac.uk", "Kenneth.Macdonald@ed.ac.uk"]
     email_reply_to: "ext6033@ed.ac.uk"
     from_addr: "ext6033@ed.ac.uk"
     smtp_host: "bulkmailrelay.ucs.ed.ac.uk"
